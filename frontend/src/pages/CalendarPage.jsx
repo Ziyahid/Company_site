@@ -1,49 +1,39 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import { format } from 'date-fns';
+import { format, isSameDay, parseISO } from 'date-fns';
+import { CompanyContext } from '../context/CompanyContext';
 
 const CalendarPage = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedCompany, setSelectedCompany] = useState('All');
-
-  const companies = [
-    {
-      _id: '1',
-      name: 'Alpha Corp',
-      events: [
-        { date: '2025-06-20', service: 'Audit', event: 'Internal Audit' },
-        { date: '2025-06-23', service: 'Tax', event: 'Tax Filing' },
-      ],
-    },
-    {
-      _id: '2',
-      name: 'Beta Ltd',
-      events: [
-        { date: '2025-06-20', service: 'Compliance', event: 'Annual Review' },
-      ],
-    },
-    {
-      _id: '3',
-      name: 'Gamma Inc',
-      events: [
-        { date: '2025-06-25', service: 'Legal', event: 'Contract Signing' },
-      ],
-    },
-  ];
-
-  const formattedSelectedDate = format(selectedDate, 'yyyy-MM-dd');
+  const { companyList } = useContext(CompanyContext);
 
   const filteredCompanies =
     selectedCompany === 'All'
-      ? companies
-      : companies.filter((c) => c.name === selectedCompany);
+      ? companyList
+      : companyList.filter((c) => c.name === selectedCompany);
 
   const eventsOnDate = filteredCompanies.flatMap((company) =>
-    company.events
-      .filter((event) => event.date === formattedSelectedDate)
-      .map((event) => ({ ...event, companyName: company.name }))
+    (company.events || [])
+      .filter((event) => isSameDay(parseISO(event.date), selectedDate))
+      .map((event) => ({
+        ...event,
+        companyName: company.name
+      }))
   );
+
+  const tileContent = ({ date, view }) => {
+    if (view !== 'month') return null;
+    const hasEvent = filteredCompanies.some((company) =>
+      (company.events || []).some((event) =>
+        isSameDay(parseISO(event.date), date)
+      )
+    );
+    return hasEvent ? (
+      <div className="mt-1 w-2 h-2 rounded-full bg-blue-500 mx-auto" />
+    ) : null;
+  };
 
   return (
     <div className="p-10 max-w-7xl mx-auto">
@@ -59,8 +49,8 @@ const CalendarPage = () => {
           className="border border-gray-300 rounded-lg px-5 py-3 text-lg w-full md:w-1/2 shadow-sm"
         >
           <option value="All">All</option>
-          {companies.map((company) => (
-            <option key={company._id} value={company.name}>
+          {companyList.map((company) => (
+            <option key={company.name} value={company.name}>
               {company.name}
             </option>
           ))}
@@ -73,7 +63,7 @@ const CalendarPage = () => {
             onChange={setSelectedDate}
             value={selectedDate}
             className="w-full"
-            tileClassName="text-lg"
+            tileContent={tileContent}
           />
         </div>
 
@@ -94,10 +84,10 @@ const CalendarPage = () => {
                     {event.companyName}
                   </p>
                   <p className="text-gray-700 text-lg mt-2">
-                    <span className="font-medium">Service:</span> {event.service}
+                    <span className="font-medium">Events:</span> {event.title} ,
                   </p>
                   <p className="text-gray-700 text-lg">
-                    <span className="font-medium">Event:</span> {event.event}
+                    <span className="font-medium"></span> {event.description}
                   </p>
                 </li>
               ))}
