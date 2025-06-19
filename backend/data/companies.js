@@ -6,7 +6,7 @@ const companies = [
     "registrationNumber": "REG-2024-001",
     "about": "Digitized leadingedge installation",
     "agentName": "Sarah Johnson",
-    "agentEmail": "sarah.johnson@corporateservices.com",
+    "email": "sarah.johnson@corporateservices.com",
     "services": [
       {
         "name": "Audit",

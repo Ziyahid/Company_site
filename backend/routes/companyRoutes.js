@@ -4,10 +4,10 @@ import Company from '../models/companyModel.js';
 
 const router = express.Router();
 
-// Get all companies
+
 router.get('/', getCompanies);
 
-// Get specific company
+
 router.get('/:companyId', async (req, res) => {
   try {
     const company = await Company.findById(req.params.companyId);
@@ -21,7 +21,6 @@ router.get('/:companyId', async (req, res) => {
   }
 });
 
-// ➕ ADD EVENT TO COMPANY
 router.post('/:companyId/events', async (req, res) => {
   const { companyId } = req.params;
   const { title, date, description } = req.body;
@@ -29,7 +28,7 @@ router.post('/:companyId/events', async (req, res) => {
   console.log('POST /events - Adding event to company:', companyId);
   console.log('Event data:', { title, date, description });
 
-  // Validate input
+
   if (!title || !date || !description) {
     return res.status(400).json({ 
       message: 'Missing required fields: title, date, and description are required' 
@@ -45,18 +44,17 @@ router.post('/:companyId/events', async (req, res) => {
 
     console.log('Company found:', company.name);
 
-    // Create new event object
     const newEvent = {
       title: title.trim(),
       date,
       description: description.trim()
     };
 
-    // Add event to company's events array
+ 
     company.events.push(newEvent);
     await company.save();
 
-    // Get the newly created event (with its generated _id)
+ 
     const addedEvent = company.events[company.events.length - 1];
     console.log('Event added successfully:', addedEvent);
 
@@ -70,7 +68,7 @@ router.post('/:companyId/events', async (req, res) => {
   }
 });
 
-// 🗑️ DELETE EVENT FROM COMPANY
+
 router.delete('/:companyId/events/:eventId', async (req, res) => {
   const { companyId, eventId } = req.params;
   
@@ -86,7 +84,7 @@ router.delete('/:companyId/events/:eventId', async (req, res) => {
     console.log('Company found:', company.name);
     console.log('Events before deletion:', company.events.length);
 
-    // Find and remove the event
+ 
     const initialLength = company.events.length;
     company.events.pull({ _id: eventId });
     
@@ -107,5 +105,30 @@ router.delete('/:companyId/events/:eventId', async (req, res) => {
     });
   }
 });
+
+
+
+router.put('/api/companies/:id/email', async (req, res) => {
+  const { id } = req.params;
+  const { email } = req.body;
+
+  try {
+    const updatedCompany = await Company.findByIdAndUpdate(
+      id,
+      { email },
+      { new: true }
+    );
+
+    if (!updatedCompany) {
+      return res.status(404).json({ message: 'Company not found' });
+    }
+
+    res.json(updatedCompany);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 
 export default router;

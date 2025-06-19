@@ -28,7 +28,7 @@ useEffect(() => {
           <p><span className="font-medium text-gray-600">Agent Name:</span> {company.agentName}</p>
           <p>
             <span className="font-medium text-gray-600">Email:</span>{' '}
-            <a href={`mailto:${company.agentEmail}`} className="text-blue-600 hover:underline">
+            <a href={`mailto:${company.email}`} className="text-blue-600 hover:underline">
               {company.email}
             </a>
           </p>

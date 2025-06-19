@@ -2,19 +2,15 @@ import React, { useState, useContext } from 'react';
 import { FaEdit, FaPlus, FaSave, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { CompanyContext } from '../context/CompanyContext';
+import axios from 'axios';
 
 const Entities = () => {
   const [editingEmailId, setEditingEmailId] = useState(null);
   const [newEmail, setNewEmail] = useState('');
   const navigate = useNavigate();
-
   const { companyList } = useContext(CompanyContext);
 
-  console.log(companyList)
-
-  const handleRowClick = (companyId) => {
-    navigate(`/company/${companyId}`);
-  };
+  const handleRowClick = (companyId) => navigate(`/company/${companyId}`);
 
   const handleEditEmail = (e, companyId, currentEmail) => {
     e.stopPropagation();
@@ -22,15 +18,17 @@ const Entities = () => {
     setNewEmail(currentEmail);
   };
 
-  const handleSaveEmail = (e, companyId) => {
+  const handleSaveEmail = async (e, companyId) => {
     e.stopPropagation();
-    // Ideally: send PATCH request to backend and refresh data
-    const updatedCompanies = companyList.map(company =>
-      company._id === companyId ? { ...company, email: newEmail } : company
-    );
-    // If CompanyContext supports a setter, use it here. For now, just reset local UI state.
-    setEditingEmailId(null);
-    setNewEmail('');
+    try {
+      const res = await axios.put(`/api/companies/${companyId}/email`, { email: newEmail });
+  
+      setEditingEmailId(null);
+      setNewEmail('');
+    } catch (error) {
+      console.error('Failed to update email:', error);
+      alert('Error updating email');
+    }
   };
 
   const handleCancelEdit = (e) => {
@@ -46,61 +44,58 @@ const Entities = () => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Entities</h1>
+        <h1 className="text-3xl font-semibold text-gray-800">Entities</h1>
         <button
           onClick={handleAddCompany}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition"
         >
-          <FaPlus /> Add Company
+          <FaPlus className="text-sm" />
+          <span className="text-sm font-medium">Add Company</span>
         </button>
       </div>
 
-      <div className="overflow-x-auto shadow rounded-lg">
-        <table className="min-w-full bg-white text-sm">
-          <thead>
-            <tr className="bg-gray-100 text-left text-gray-700">
-              <th className="py-3 px-4">Company Name</th>
-              <th className="py-3 px-4">Reg. Number</th>
-              <th className="py-3 px-4">Jurisdiction</th>
-              <th className="py-3 px-4">Agent Name</th>
-              <th className="py-3 px-4">Actions</th>
+      <div className="overflow-x-auto shadow-md rounded-xl bg-white">
+        <table className="min-w-full divide-y divide-gray-100 text-sm">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left font-medium text-gray-500">Company Name</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-500">Reg. Number</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-500">Jurisdiction</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-500">Agent Name</th>
+              <th className="px-6 py-3 text-left font-medium text-gray-500">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-100">
             {companyList.length > 0 ? (
               companyList.map((company) => (
-                <tr key={company._id} className="hover:bg-gray-50 border-b">
-                  <td className="py-3 px-4 cursor-pointer" onClick={() => handleRowClick(company._id)}>
-                    {company.name}
-                  </td>
-                  <td className="py-3 px-4 cursor-pointer" onClick={() => handleRowClick(company._id)}>
-                    {company.registrationNumber}
-                  </td>
-                  <td className="py-3 px-4 cursor-pointer" onClick={() => handleRowClick(company._id)}>
-                    {company.jurisdiction}
-                  </td>
-                  <td className="py-3 px-4 cursor-pointer" onClick={() => handleRowClick(company._id)}>
-                    {company.agentName}
-                  </td>
-                  <td className="py-3 px-4">
+                <tr
+                  key={company._id}
+                  className="hover:bg-gray-50 transition cursor-pointer"
+                  onClick={() => handleRowClick(company._id)}
+                >
+                  <td className="px-6 py-4">{company.name}</td>
+                  <td className="px-6 py-4">{company.registrationNumber}</td>
+                  <td className="px-6 py-4">{company.jurisdiction}</td>
+                  <td className="px-6 py-4">{company.agentName}</td>
+                  <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                     {editingEmailId === company._id ? (
-                      <div className="flex gap-2 items-center">
+                      <div className="flex items-center gap-2">
                         <input
                           type="email"
                           value={newEmail}
                           onChange={(e) => setNewEmail(e.target.value)}
-                          className="border px-2 py-1 text-sm rounded"
+                          className="px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
                         />
                         <button
                           onClick={(e) => handleSaveEmail(e, company._id)}
-                          className="text-green-600 hover:underline"
+                          className="text-green-600 hover:text-green-700"
                           title="Save"
                         >
                           <FaSave />
                         </button>
                         <button
                           onClick={handleCancelEdit}
-                          className="text-red-500 hover:underline"
+                          className="text-red-500 hover:text-red-600"
                           title="Cancel"
                         >
                           <FaTimes />
@@ -109,9 +104,9 @@ const Entities = () => {
                     ) : (
                       <button
                         onClick={(e) => handleEditEmail(e, company._id, company.email)}
-                        className="text-blue-600 hover:underline flex items-center gap-1"
+                        className="text-blue-600 hover:text-blue-700 flex items-center gap-1"
                       >
-                        <FaEdit /> Edit Email
+                        <FaEdit className="text-sm" /> <span className="text-sm">Edit Email</span>
                       </button>
                     )}
                   </td>
@@ -119,7 +114,7 @@ const Entities = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="text-center py-6 text-gray-500">
+                <td colSpan="5" className="text-center py-6 text-gray-400">
                   No companies found.
                 </td>
               </tr>
