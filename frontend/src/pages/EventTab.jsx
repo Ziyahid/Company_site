@@ -1,47 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { useParams } from 'react-router-dom';
+import { CompanyContext } from '../context/CompanyContext';
 
 const EventsTab = () => {
   const { id } = useParams();
   const [company, setCompany] = useState(null);
   const [newEvent, setNewEvent] = useState({ title: '', date: '', description: '' });
+  const {companyList} = useContext(CompanyContext)
 
-  useEffect(() => {
-    const dummyCompanies = [
-      {
-        _id: '1',
-        name: 'Alpha Corp',
-        about: 'A technology firm operating globally.',
-        events: [
-          { title: 'KYC Verification', date: '2024-06-01', description: 'Verification of Know Your Customer documents.' },
-          { title: 'Registered Office Verification', date: '2024-06-10', description: 'Verification of office address for official correspondence.' },
-          { title: 'Company Name Verification', date: '2024-06-20', description: 'Approval of company name with regulatory authority.' },
-          { title: 'Compliance Review', date: '2024-07-01', description: 'Quarterly review of statutory compliance.' }
-        ]
-      },
-      {
-        _id: '2',
-        name: 'Beta Ltd',
-        about: 'A financial services provider.',
-        events: [
-          { title: 'KYC Verification', date: '2024-05-15', description: 'Client document verification process.' },
-          { title: 'Compliance Review', date: '2024-06-05', description: 'Internal audit and regulatory compliance check.' }
-        ]
-      },
-      {
-        _id: '3',
-        name: 'Gamma Inc',
-        about: 'A consulting and advisory firm.',
-        events: [
-          { title: 'Company Name Verification', date: '2024-04-25', description: 'Approval of company name and domain check.' },
-          { title: 'Registered Office Verification', date: '2024-05-01', description: 'Physical address verification for registration.' }
-        ]
-      }
-    ];
+ useEffect(() => {
+  const selected = companyList.find((c) => c._id === id);
+  setCompany(selected);
+}, [id, companyList]);
 
-    const selected = dummyCompanies.find((c) => c._id === id);
-    setCompany(selected);
-  }, [id]);
 
  const handleDelete = (index) => {
   const eventToDelete = company.events[index];
