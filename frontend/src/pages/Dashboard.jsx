@@ -18,9 +18,19 @@ const Dashboard = () => {
   const [companyList, setCompanyList] = useState([]);
 
   useEffect(() => {
-    
-    setCompanyList(companyData);
-  }, []);
+  const fetchCompanies = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/companies'); 
+      const data = await res.json();
+      setCompanyList(data);
+    } catch (error) {
+      console.error('Failed to fetch companies:', error);
+    }
+  };
+
+  fetchCompanies();
+}, []);
+
 
   return (
     <div className="space-y-6">
