@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { FaBuilding, FaCheckCircle, FaClock, FaHourglassStart } from 'react-icons/fa';
-import companyData from '../data/companyData'; // Rename this import to avoid conflict
+import { CompanyContext } from '../context/CompanyContext';
 
 const statusIcon = {
   "Completed": <FaCheckCircle className="text-green-500 inline-block mr-1" />,
@@ -15,27 +15,12 @@ const statusColor = {
 };
 
 const Dashboard = () => {
-  const [companyList, setCompanyList] = useState([]);
-
-  useEffect(() => {
-  const fetchCompanies = async () => {
-    try {
-      const res = await fetch('http://localhost:5000/api/companies'); 
-      const data = await res.json();
-      setCompanyList(data);
-    } catch (error) {
-      console.error('Failed to fetch companies:', error);
-    }
-  };
-
-  fetchCompanies();
-}, []);
-
+  const { companyList } = useContext(CompanyContext);
 
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold mb-4 text-gray-800">Dashboard</h1>
-      {companyList.map((company, index) => (
+      {companyList.slice(0, 3).map((company, index) => (
         <div
           key={index}
           className="border rounded-lg p-6 shadow-md bg-white transition duration-300 transform hover:shadow-xl hover:scale-[1.01]"
@@ -59,11 +44,20 @@ const Dashboard = () => {
                 <p className={`text-sm flex items-center ${statusColor[service.status]}`}>
                   {statusIcon[service.status]} {service.status}
                 </p>
-                {service.events.length > 0 && (
+
+                {(service?.events?.length > 0 || service.status === "In Progress") && (
                   <ul className="mt-2 list-disc list-inside text-sm text-gray-700">
-                    {service.events.map((event, i) => (
+                    {service?.events?.map((event, i) => (
                       <li key={i}>{event}</li>
                     ))}
+
+                    {service.status === "In Progress" && (
+                      <>
+                        <li>Kickoff meeting held</li>
+                        <li>Initial deployment done</li>
+                        <li>Monitoring ongoing</li>
+                      </>
+                    )}
                   </ul>
                 )}
               </div>
@@ -76,4 +70,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-

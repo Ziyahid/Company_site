@@ -1,28 +1,19 @@
 import { useParams, NavLink, Outlet } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useContext } from 'react';
+import { CompanyContext } from '../context/CompanyContext';
 
 const EntityDetails = () => {
   const { id } = useParams();
   const [company, setCompany] = useState(null);
+  const {companyList} = useContext(CompanyContext)
 
-  useEffect(() => {
-    const dummyCompanies = [
-      {
-        _id: '1',
-        name: 'Alpha Corp',
-        registrationNumber: 'REG-001',
-        jurisdiction: 'USA',
-        agentName: 'John Doe',
-        email: 'alpha@example.com',
-        directors: [
-          { name: 'John Smith', dob: '1980-05-12', nationality: 'American', gender: 'Male' }
-        ]
-      },
-  
-    ];
-    const selected = dummyCompanies.find((c) => c._id === id);
+useEffect(() => {
+  if (companyList && companyList.length > 0) {
+    const selected = companyList.find((c) => c._id === id);
     setCompany(selected);
-  }, [id]);
+  }
+}, [id, companyList]);
 
   if (!company) return <div className="p-6 text-gray-600">Loading company data...</div>;
 
@@ -37,7 +28,7 @@ const EntityDetails = () => {
           <p><span className="font-medium text-gray-600">Agent Name:</span> {company.agentName}</p>
           <p>
             <span className="font-medium text-gray-600">Email:</span>{' '}
-            <a href={`mailto:${company.email}`} className="text-blue-600 hover:underline">
+            <a href={`mailto:${company.agentEmail}`} className="text-blue-600 hover:underline">
               {company.email}
             </a>
           </p>
