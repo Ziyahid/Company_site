@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import profile from '../assets/profile.png';
 
 const Profile = () => {
   const [activeSection, setActiveSection] = useState('account');
@@ -74,8 +75,17 @@ const Profile = () => {
     <div className="p-8 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Profile Settings</h1>
       <div className="flex flex-col md:flex-row gap-6">
-        <div className="w-full md:w-1/3 bg-gray-100 p-4 rounded-lg shadow">
-          <ul className="space-y-3">
+        <div className="w-full md:w-1/3 bg-gray-100 p-4 rounded-lg shadow flex flex-col items-center">
+          {/* Profile Picture */}
+          <img
+            src={profile}
+            alt="Profile"
+            className="w-24 h-24 rounded-full mb-4 object-cover"
+          />
+          <p className="text-lg font-semibold text-gray-800 mb-6">John Doe</p>
+
+          {/* Navigation Buttons */}
+          <ul className="w-full space-y-3">
             {sections.map((section) => (
               <li key={section.id}>
                 <button
@@ -92,6 +102,8 @@ const Profile = () => {
             ))}
           </ul>
         </div>
+
+        {/* Section Content */}
         <div className="w-full md:w-2/3 bg-white p-6 rounded-lg shadow">
           {renderSectionContent()}
         </div>

@@ -18,7 +18,7 @@ const NotificationsPage = () => {
     <div className="min-h-screen bg-gray-100 p-6">
       <h1 className="text-2xl font-bold mb-4 text-gray-700">🔔 Notifications</h1>
 
-      <div className="space-y-4">
+      <div className="space-y-4 w-full">
         <AnimatePresence>
           {notifications.map((n) => (
             <Notification

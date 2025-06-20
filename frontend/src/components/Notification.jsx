@@ -29,7 +29,7 @@ const Notification = ({ type = 'info', title, onClose }) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: 50 }}
       layout
-      className={`max-w-sm w-full shadow-md rounded-xl px-4 py-3 border ${style.bg} flex items-start gap-3 relative`}
+      className={` w-full shadow-md rounded-xl px-4 py-3 border ${style.bg} flex items-start gap-3 relative`}
     >
       <div className="text-xl">{style.icon}</div>
       <div className="flex-1">
